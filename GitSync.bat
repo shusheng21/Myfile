@@ -1,6 +1,7 @@
 @echo off
 
-cd /d "%~dp0"
+cd /e/Myfile
+
 echo %cd%
 
 git pull origin master
