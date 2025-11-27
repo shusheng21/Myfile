@@ -1,6 +1,6 @@
 @echo off
 
-cd /e/Myfile
+cd /d "%~dp1"
 
 echo %cd%
 
