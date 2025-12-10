@@ -1,0 +1,41 @@
+package com.rao.class01;
+
+public class PrintBinary {
+    public static void myprint(int n) {
+        for (int i = 31; i >= 0; i--) {
+            System.out.print((n & (1 << i)) == 0 ? "0" : "1");
+        }
+        System.out.println();
+    }
+
+    public static void main(String[] args) {
+        int a = Integer.MAX_VALUE;
+        int b = Integer.MIN_VALUE;
+        myprint(a);
+        //正数的取值范围0-2的31次-1 最大是011111...111
+        //负数的取值-2的31次    最小1000...000
+        //他们的范围是-2147483648~2147483647
+        System.out.println("====");
+        System.out.println(a);
+        System.out.println(b);
+        myprint(-5);//11111111111111111111111111111011
+        //32位的最高位是符号位，0代表正数，1代表负数
+        //负数的二进制计算规则
+        //例如-5 为：11111111111111111111111111111011
+        //1、先看最高位32位置，为“1”，所以表示负数 -？
+        //2、计算？是多少  （取反再加一）
+        //2.1取反 得 00000000000000000000000000000100
+        //2.2加一 得 00000000000000000000000000000101
+        //所以结果为-5
+
+        //负数的计算规则使得不管对于整数还是负数，对于四则运算都通用
+        //相反数是取反加1
+        System.out.println("====");
+        int c = -6;
+        int c2 = -c;
+        int c3 = ~c + 1;
+        myprint(c);
+        myprint(c2);
+        myprint(c3);
+    }
+}
