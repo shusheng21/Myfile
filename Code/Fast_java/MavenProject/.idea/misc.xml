@@ -5,6 +5,7 @@
     <option name="originalFiles">
       <list>
         <option value="$PROJECT_DIR$/MyFirstJarProject/pom.xml" />
+        <option value="$PROJECT_DIR$/TestMybatis/pom.xml" />
       </list>
     </option>
   </component>
