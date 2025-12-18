@@ -4,6 +4,11 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+    <typeAliases>
+        <typeAlias type="com.rao.pojo.Book" alias="b"></typeAlias>
+<!--        通过`<package>`标签指定包下全部类的别名。指定后所有类的别名就是类名-->
+        <package name="com.rao.pojo"/>
+    </typeAliases>
     <environments default="mysql">
         <environment id="mysql">
             <transactionManager type="JDBC"></transactionManager>
@@ -27,4 +32,5 @@
     <mappers>
         <mapper resource="mapper/BookMapper.xml"/>
     </mappers>
+
 </configuration>

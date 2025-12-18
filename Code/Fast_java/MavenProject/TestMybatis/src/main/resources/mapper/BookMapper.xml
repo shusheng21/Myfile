@@ -6,7 +6,12 @@
 <!--    id相当于查询的方法名 public List selectAllBooks(参数){方法体} -->
 <!--    resultType相当于返回类型，放回的是Book的集合(list)，
 但只需要写集合中的内容是什么.即：Book,需要指定路径，即com.rao.pojo.Book-->
-    <select id="selectAllBooks" resultType="com.rao.pojo.Book">
+<!--    此处未使用别名-->
+<!--    <select id="selectAllBooks" resultType="com.rao.pojo.Book">-->
+<!--    此处使用了别名b-->
+<!--    <select id="selectAllBooks" resultType="b">-->
+<!--    通过`<package>`标签指定包下全部类的别名。指定后所有类的别名就是类名-->
+    <select id="selectAllBooks" resultType="book">
         select * from t_book
     </select>
 </mapper>

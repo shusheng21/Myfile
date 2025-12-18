@@ -209,11 +209,11 @@ Maven是使用Java语言编写的基于项目对象模型（POM）**项目管理
 
 5. 创建实体类
 
-在java下创建pakege:com.rao.pojo  在该路径下创建实体类Book
+在java下创建pakege:com.rao.pojo  在该路径下创建实体类Book，（属性名字及类型需要和数据库中保持一致）
 
 ![image-20251216102812375](assets/java快速/image-20251216102812375.png)
 
-6. 创建映射文件（对数据库操作的SQL信息），在核心配置文件mybatis.xml中进行扫描 
+6. 创建映射文件（对数据库操作的SQL信息），在核心配置文件mybatis.xml中进行扫描
 
 - 映射文件一般放在单独目录下，在resources下新建文件夹mapper，新建BookMapper.xml文件
 
@@ -228,7 +228,7 @@ Maven是使用Java语言编写的基于项目对象模型（POM）**项目管理
           "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
   <mapper namespace="a.b">  <!--此处的命名空间可随意写 -->
   <!--    id相当于查询的方法名 public List selectAllBooks(参数){方法体} -->
-  <!--    resultType相当于返回类型，放回的是Book的集合(list)，
+  <!--    resultType相当于返回类型，返回的是Book的集合(list)，
   但只需要写集合中的内容是什么.即：Book,需要指定路径，即com.rao.pojo.Book-->
       <select id="selectAllBooks" resultType="com.rao.pojo.Book">
           select * from t_book
@@ -268,6 +268,53 @@ public class Test {
 }
 
 ```
+
+#### 别名设置
+
+存在的问题：如果有多个查询，则resultType取值“com.rao.pojo.Book”写起来就比较麻烦
+
+![image-20251218171301730](assets/java快速/image-20251218171301730.png)
+
+MyBatis提供了别名机制可以对某个类起别名或给某个包下所有类起别名，简化resultType取值的写法。
+
+在核心配置文件（mybatis.xml）中，通过`<typeAlias>`标签明确设置类型的别名。
+
+- type:类型全限定路径
+- alias:别名名称
+
+```xml
+    <typeAliases>
+        <typeAlias type="com.rao.pojo.Book" alias="b"></typeAlias>
+    </typeAliases>
+```
+
+注意<typeAliases>不能放置在最后，每个标签的放置都有顺序要求的
+
+![image-20251218172131196](assets/java快速/image-20251218172131196.png)
+
+当类个数较多时，明确指定别名工作量较大，可以通过`<package>`标签指定包下全部类的别名。指定后所有类的别名就是类名。（也不区分大小写）
+
+```xml
+<typeAliases>
+        <package name="com.msb.pojo"/>
+</typeAliases>
+```
+
+PS:明确指定别名和指定包的方式可以同时存在
+
+#### 内置别名
+
+MyBatis框架中内置了一些常见类型的别名。这些别名不需要配置
+
+![image-20251218173009372](assets/java快速/image-20251218173009372.png)
+
+#### 属性文件配置
+
+在mybatis.xml核心配置文件中，<property> 这部分配置信息还可以单独摘出来
+
+![image-20251218173234989](assets/java快速/image-20251218173234989.png)
+
+#### **MyBatis启动日志功能**
 
 
 
