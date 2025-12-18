@@ -4,8 +4,10 @@
         PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
+<!--    加载mybatis.cfg.xml文件-->
+    <properties resource="db.properties"></properties>
     <typeAliases>
-        <typeAlias type="com.rao.pojo.Book" alias="b"></typeAlias>
+<!--        <typeAlias type="com.rao.pojo.Book" alias="b"></typeAlias>-->
 <!--        通过`<package>`标签指定包下全部类的别名。指定后所有类的别名就是类名-->
         <package name="com.rao.pojo"/>
     </typeAliases>
@@ -13,12 +15,18 @@
         <environment id="mysql">
             <transactionManager type="JDBC"></transactionManager>
             <dataSource type="POOLED">
-<!--                前面的name需要按照规定好的来写，将value替换为自己需要的就可以-->
-                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>
-<!--                注意：下面的 & 需要替换为 &amp; -->
-                <property name="url" value="jdbc:mysql://127.0.0.1:3306/msb?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai&amp;allowPublicKeyRetrieval=true"/>
-                <property name="username" value="root"/>
-                <property name="password" value="root"/>
+<!--&lt;!&ndash;                前面的name需要按照规定好的来写，将value替换为自己需要的就可以&ndash;&gt;-->
+<!--                <property name="driver" value="com.mysql.cj.jdbc.Driver"/>-->
+<!--&lt;!&ndash;                注意：下面的 & 需要替换为 &amp; &ndash;&gt;-->
+<!--                <property name="url" value="jdbc:mysql://127.0.0.1:3306/msb?useSSL=false&amp;useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=Asia/Shanghai&amp;allowPublicKeyRetrieval=true"/>-->
+<!--                <property name="username" value="root"/>-->
+<!--                <property name="password" value="root"/>-->
+
+<!--                将property配置信息提取出来，放在了db.properties文件下-->
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
             </dataSource>
         </environment>
 

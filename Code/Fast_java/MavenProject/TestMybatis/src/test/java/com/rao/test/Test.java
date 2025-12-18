@@ -27,7 +27,7 @@ public class Test {
         //遍历
         for (int i = 0; i < list.size(); i++) {
             Book b = (Book)list.get(i);
-            System.out.println(b.getBookname() + "---" + b.getAuthor());
+            System.out.println(b.getBookname() + "---" + b.getAuthor() + "---" + b.getPrice());
         }
         sqlSession.close();
 
