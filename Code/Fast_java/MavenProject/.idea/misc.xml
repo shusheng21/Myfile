@@ -6,7 +6,15 @@
       <list>
         <option value="$PROJECT_DIR$/MyFirstJarProject/pom.xml" />
         <option value="$PROJECT_DIR$/TestMybatis/pom.xml" />
+        <option value="$PROJECT_DIR$/TestMybatis_interface02/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
       </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/TestMybatis_interface02/pom.xml" />
+        <option value="$PROJECT_DIR$/untitled/pom.xml" />
+      </set>
     </option>
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
