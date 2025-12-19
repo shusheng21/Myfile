@@ -2,16 +2,16 @@ package com.rao.pojo;
 
 public class Book {
     private int id;
-    private String bookname;
+    private String name;
     private String author;
     private double price;
 
     public Book() {
     }
 
-    public Book(int id, String bookname, String author, double price) {
+    public Book(int id, String name, String author, double price) {
         this.id = id;
-        this.bookname = bookname;
+        this.name = name;
         this.author = author;
         this.price = price;
     }
@@ -24,12 +24,12 @@ public class Book {
         this.id = id;
     }
 
-    public String getBookname() {
-        return bookname;
+    public String getName() {
+        return name;
     }
 
-    public void setBookname(String bookname) {
-        this.bookname = bookname;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getAuthor() {
