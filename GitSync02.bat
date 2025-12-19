@@ -1,39 +1,39 @@
 @echo off
 cd /d "%~dp0"
-echo 当前目录: %cd%
-echo 正在从GitHub仓库拉取更新...
+echo ��ǰĿ¼: %cd%
+echo ���ڴ�GitHub�ֿ���ȡ����...
 git pull origin master
 if errorlevel 1 (
-echo 错误: 拉取失败！
+echo ����: ��ȡʧ�ܣ�
 pause
 exit /b 1
 )
-echo 正在添加所有更改...
+echo �����������и���...
 git add .
 if errorlevel 1 (
-echo 错误: 添加文件失败！
+echo ����: �����ļ�ʧ�ܣ�
 pause
 exit /b 1
 )
-echo 正在提交更改...
+echo �����ύ����...
 git commit -m "%date% %time%"
 if errorlevel 1 (
-echo 提示: 没有要提交的更改。
+echo ��ʾ: û��Ҫ�ύ�ĸ��ġ�
 ) else (
-echo 提交成功！
+echo �ύ�ɹ���
 )
-echo 正在推送到GitHub仓库...
+echo �������͵�GitHub�ֿ�...
 git push origin master
 if errorlevel 1 (
-echo 错误: 推送失败！
+echo ����: ����ʧ�ܣ�
 pause
 exit /b 1
 )
 echo.
 echo ========================================
-echo 执行成功！
+echo ִ�гɹ���
 echo ========================================
 echo.
-echo 所有操作已完成，笔记已成功同步到GitHub。
+echo ���в�������ɣ��ʼ��ѳɹ�ͬ����GitHub��
 echo.
 pause
