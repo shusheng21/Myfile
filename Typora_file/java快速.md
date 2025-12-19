@@ -310,25 +310,97 @@ MyBatis框架中内置了一些常见类型的别名。这些别名不需要配�
 
 #### 属性文件配置
 
-在mybatis.xml核心配置文件中，<property> 这部分配置信息还可以单独摘出来
+在mybatis.xml核心配置文件中，<property> 这部分配置信息还可以单独摘出来（达到解耦的作用），一般放在resources目录下“db.properties”，文件类型必须是.properties
 
 ![image-20251218173234989](assets/java快速/image-20251218173234989.png)
 
+MyBatis支持加载属性文件（.properties文件），可以通过在属性文件中配置数据库连接属性然后加载。这种方式要比直接写稍微麻烦一点点，但是却把所有的数据库连接书写到了统一的文件中，以后查看或修改时更加方便。
+
+在src/main/resources目录中创建db.properties文件：
+
+```properties
+url=jdbc:mysql://localhost:3306/ssm?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+
+url=jdbc:mysql://127.0.0.1:3306/msb?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+driver=com.mysql.cj.jdbc.Driver
+username=root
+password=root
+
+```
+
+修改mybatis.cfg.xml文件，设置加载属性。 
+
+```xml
+<properties resource="db.properties"></properties>
+```
+
+![image-20251219063333965](assets/java快速/image-20251219063333965.png)
+
+通过${key}获取属性文件中配置的值,如：
+
+```xml
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${username}"/>
+                <property name="password" value="${password}"/>
+```
+
 #### **MyBatis启动日志功能**
 
+MyBatis框架内置日志工厂。日志工厂负责自动加载项目中配置的日志。MyBatis支持以下日志：
+
+▢ SLF4J
+
+▢ Apache Commons Logging
+
+▢ Log4j 2
+
+▢ **Log4j** (deprecated since 3.5.9)
+
+▢ JDK logging
+
+1. 在pom.xml中增加[log4j的依赖：]([Maven Repository: log4j » log4j » 1.2.17](https://mvnrepository.com/artifact/log4j/log4j/1.2.17))
+2. 在resources中新建log4j.properties配置文件。名称必须叫这个名字，扩展名必须是.properties。
+
+```properties
+# log4j中定义的级别：fatal(致命错误) > error(错误) >warn(警告) >info(普通信息) >debug(调试信息)>trace(跟踪信息)
+log4j.rootLogger = DEBUG , console
+
+### console ###
+log4j.appender.console = org.apache.log4j.ConsoleAppender
+log4j.appender.console.Target = System.out
+log4j.appender.console.layout = org.apache.log4j.PatternLayout
+log4j.appender.console.layout.ConversionPattern = [%p] [%-d{yyyy-MM-dd HH\:mm\:ss}] %C.%M(%L) | %m%n
+```
+
+3. 如果说你只是想看sql执行过程，那么可以整体调高，局部降低：将整个日志级别调为ERROR，然后mapper.xml涉及的内容级别降低为TRACE。这样整体的多余信息不会输出，然后mapper.xml中的涉及内容会详细打印，log4j.properties加入：
+
+```properties
+# log4j.logger是固定的，a.b是命名空间的名字。
+log4j.logger.a.b=TRACE
+```
+
+#### MyBatis接口绑定方案
 
 
 
+![image-20251219073211112](assets/java快速/image-20251219073211112.png)
 
+![image-20251219073228334](assets/java快速/image-20251219073228334.png)
 
+一级一级创建
 
+![image-20251219073423253](assets/java快速/image-20251219073423253.png)
 
+建议和接口名字保持一致
 
+![image-20251219073557143](assets/java快速/image-20251219073557143.png)
 
+此时相当于用BookMapper.xml（这个类）去实现了接口BookMapper
 
+![image-20251219073652021](assets/java快速/image-20251219073652021.png)
 
-
-
+![image-20251219074244435](assets/java快速/image-20251219074244435.png)
 
 
 
