@@ -380,7 +380,77 @@ log4j.appender.console.layout.ConversionPattern = [%p] [%-d{yyyy-MM-dd HH\:mm\:s
 log4j.logger.a.b=TRACE
 ```
 
-#### MyBatis接口绑定方案
+#### MyBatis接口绑定方案 **Mybatis_Interface02**
+
+之前项目存在的问题
+
+（1）方法不能直接调用
+
+BookMapper.xml中的每一个<select>标签对应一个方法
+
+```xml
+<!-- BookMapper.xml-->
+<mapper namespace="a.b">
+    <select id="selectAllBooks" resultType="book">
+        select * from t_book
+    </select>
+</mapper>
+```
+
+每次使用需要将方法selectAllBooks作为一个参数传递给**sqlSession.selectList("a.b.selectAllBooks");**
+
+当有多个<select>查询时就对应着多个方法，需要传递多个参数，使用不便
+
+```java
+//Test.java
+ public static void main(String[] args) throws IOException {
+        String resource = "mybatis.xml";
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //执行查询,此处"a.b.selectAllBooks"是BookMapper.xml中的ID，其中a.b是命名空间
+        List list = sqlSession.selectList("a.b.selectAllBooks");
+        for (int i = 0; i < list.size(); i++) {
+            Book b = (Book)list.get(i);
+            System.out.println(b.getName() + "---" + b.getAuthor() + "---" + b.getPrice());
+        }
+        sqlSession.close();
+    }
+```
+
+
+
+（2）多个参数问题处理麻烦
+
+```xml
+<!-- BookMapper.xml-->
+<mapper namespace="a.b">
+    <select id="selectAllBooks" resultType="book">  
+        <!--这里就需要传入两个参数，可以在Test.java的sqlSession.selectList()中传入参数-->   
+        select * from t_book where id = **具体某个数值 and price > **具体某个数值  
+    </select>
+</mapper>
+```
+
+```java
+List list = sqlSession.selectList("a.b.selectAllBooks");
+//selectList源码如下
+    <E> List<E> selectList(String statement);
+    <E> List<E> selectList(String statement, Object parameter);
+    <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds);
+//传入其他参数需要将其封装成对象（Object parameter），比较麻烦
+```
+
+（3）项目没有规范可言，不利于面向接口编程思想。
+
+```xml
+<!-- BookMapper.xml--> 方法名字（selectAllBooks）和返回类型都是自己写，没有规范
+<mapper namespace="a.b">
+    <select id="selectAllBooks" resultType="book">
+        select * from t_book
+    </select>
+</mapper>
+```
 
 
 
@@ -388,7 +458,71 @@ log4j.logger.a.b=TRACE
 
 ![image-20251219073228334](assets/java快速/image-20251219073228334.png)
 
-一级一级创建
+接口绑定方案
+
+（1）创建新的Maven项目
+
+（2）配置pom.xml
+
+（3）配置全局配置文件(mybatis.xml)
+
+（4）配置数据库属性文件(db.propertides)
+
+（5）日志配置文件(log4j.properties)
+
+（6）创建实体类(Book.java)
+
+（7）创建接口(Bookmapper.java Interface类型)  
+
+​	![image-20251221165745344](assets/java快速/image-20251221165745344.png)
+
+（8）创建映射文件（BookMapper.xml）：要求：namespace取值必须是接口的全限定路径、标签中的id属性值必须和方法名对应
+
+此时相当于用BookMapper.xml（这个类）去实现了接口BookMapper
+
+![image-20251221165939516](assets/java快速/image-20251221165939516.png)
+
+```xml
+<!--BookMapper.xml-->
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace取值必须是接口的全限定路径、标签中的id属性值必须和方法名对应-->
+<mapper namespace="com.rao.mapper.BookMapper">
+    <select id="MySelectAllBooks" resultType="Book">
+        select * from t_book
+    </select>
+</mapper>
+```
+
+（9）编写测试类（通过动态代理模式）
+
+```java
+public static void main(String[] args) throws IOException {
+        //指定核心配置文件的路径
+//        String resource = "org/mybatis/example/mybatis-config.xml";
+        String resource = "mybatis.xml";
+        //获取加载配置文件的输入流
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        //加载配置文件，创建工厂类
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+
+        //通过工厂类获取一个会话
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //使用了动态代理，BookMapper mapper（接口类型） = BookMapper的实现类
+        BookMapper mapper = sqlSession.getMapper(BookMapper.class);
+        List list = mapper.MySelectAllBooks();
+        //遍历
+        for (int i = 0; i < list.size(); i++) {
+            Book b = (Book) list.get(i);
+            System.out.println(b.getName() + "---" + b.getAuthor() + "---" + b.getPrice());
+        }
+        sqlSession.close();
+    }
+```
+
+resources目录下，com.rao.mapper需要一级一级创建
 
 ![image-20251219073423253](assets/java快速/image-20251219073423253.png)
 
@@ -396,13 +530,268 @@ log4j.logger.a.b=TRACE
 
 ![image-20251219073557143](assets/java快速/image-20251219073557143.png)
 
-此时相当于用BookMapper.xml（这个类）去实现了接口BookMapper
+#### MyBatis参数传递
 
-![image-20251219073652021](assets/java快速/image-20251219073652021.png)
+![image-20251221180805239](assets/java快速/image-20251221180805239.png)
 
-![image-20251219074244435](assets/java快速/image-20251219074244435.png)
+1. 多个纯参数（没有对象）
 
-111
+使用符号： **#{}**进行获取
+
+{}中名字使用**规则**：
+
+arg0、arg1、argM(M为从0开始的数字，和方法参数顺序对应)  或  param1、param2、paramN（N为从1开始的数字，和方法参数顺序对应）。
+
+2. **一个参数且参数为对象**
+
+使用符号： **#{}**进行获取
+
+直接利用属性名即可
+
+3. **多个参数且参数有对象**
+
+使用符号： **#{}**进行获取
+
+argM.属性名 或者 paramN.属性名
+
+PS：argM. 或者 paramN. 不可以省略不写
+
+```java
+//BookMapper.java
+public interface BookMapper {
+    List MySelectAllBooks();
+    Book selectBookByAuthorandName(String name,String suthor); //多个纯参数（没有对象）
+    Book selectBookByAuthorandName2(Book book); //一个参数且参数为对象
+    Book selectBookByAuthorandName3(String name,Book book);  //多个参数且参数有对象
+}
+```
+
+```xml
+<!--BookMapper.xml-->
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace取值必须是接口的全限定路径、标签中的id属性值必须和方法名对应-->
+<mapper namespace="com.rao.mapper.BookMapper">
+    <select id="MySelectAllBooks" resultType="Book">
+        select * from t_book
+    </select>
+    <select id="selectBookByAuthorandName" resultType = "Book">
+<!--        下面两种方式等效，arg0,param1  前者从0开始，后者从1开始-->
+<!--        多个纯参数，直接使用argM  或者 paramN-->
+<!--        select * from t_book where name =#{arg0} and author =#{arg1}-->
+        select * from t_book where name =#{param1} and author =#{param2}
+    </select>
+<!--一个参数且参数为对象,直接利用属性名即可-->
+    <select id="selectBookByAuthorandName2" resultType = "Book">
+        select * from t_book where name =#{name} and author =#{author}
+    </select>
+<!--多个参数且参数有对象,非对象类型的参数直接arg/param ,对象类型的参数使用argM.属性名-->
+    <select id="selectBookByAuthorandName3" resultType = "Book">
+        select * from t_book where name =#{param1} and author =#{param2.author}
+    </select>
+</mapper>
+```
+
+```java
+//Test_canshu.java
+package com.rao.test;
+public class Test_cangshu {
+    public static void main(String[] args) throws IOException {
+        //指定核心配置文件的路径
+//        String resource = "org/mybatis/example/mybatis-config.xml";
+        String resource = "mybatis.xml";
+        //获取加载配置文件的输入流
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        //加载配置文件，创建工厂类
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        //通过工厂类获取一个会话
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //使用了动态代理，BookMapper mapper（接口类型） = BookMapper的实现类
+        BookMapper mapper = sqlSession.getMapper(BookMapper.class);
+
+//        多个纯参数
+//        Book book = mapper.selectBookByAuthorandName("史记","无名");
+
+//      一个参数且参数为对象
+//        Book b = new Book();
+//        b.setName("史记");
+//        b.setAuthor("无名");
+//        Book book = mapper.selectBookByAuthorandName2(b);
+
+//        一个参数且参数为对象
+        Book b2 = new Book();
+        b2.setAuthor("无名");
+        Book book = mapper.selectBookByAuthorandName3("史记",b2);
+
+        System.out.println(book.getName());
+
+        sqlSession.close();
+    }
+}
+```
+
+#### MyBatis_增删改操作
+
+```java
+//Bookmapper.java
+public interface BookMapper {
+    List MySelectAllBooks();
+    Book selectBookByAuthorandName(String name,String suthor); //多个纯参数（没有对象）
+    Book selectBookByAuthorandName2(Book book); //一个参数且参数为对象
+    Book selectBookByAuthorandName3(String name,Book book);  //多个参数且参数有对象
+    int insertBook(Book book);//添加书籍操作，返回值为int类型，代表影响的条数
+    int deleteBookByName(String name);//通过书名删除书籍
+    int updateBook(int id);//通过ID来查找对应书籍并更新书籍
+}
+```
+
+```xml
+<!--Bookmapper.xml-->
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace取值必须是接口的全限定路径、标签中的id属性值必须和方法名对应-->
+<mapper namespace="com.rao.mapper.BookMapper">
+    <select id="MySelectAllBooks" resultType="Book">
+        select * from t_book
+    </select>
+    <select id="selectBookByAuthorandName" resultType = "Book">
+<!--        下面两种方式等效，arg0,param1  前者从0开始，后者从1开始-->
+<!--        多个纯参数，直接使用argM  或者 paramN-->
+<!--        select * from t_book where name =#{arg0} and author =#{arg1}-->
+        select * from t_book where name =#{param1} and author =#{param2}
+    </select>
+<!--一个参数且参数为对象,直接利用属性名即可-->
+    <select id="selectBookByAuthorandName2" resultType = "Book">
+        select * from t_book where name =#{name} and author =#{author}
+    </select>
+<!--多个参数且参数有对象,非对象类型的参数直接arg/param ,对象类型的参数使用argM.属性名-->
+    <select id="selectBookByAuthorandName3" resultType = "Book">
+        select * from t_book where name =#{param1} and author =#{param2.author}
+    </select>
+
+<!--    增加书籍-->
+    <insert id="insertBook">
+        insert into t_book (id,name,author,price) values (#{id},#{name},#{author},#{price})
+    </insert>
+
+<!--    删除书籍-->
+    <delete id="deleteBookByName">
+        delete from t_book where name = #{param1}
+    </delete>
+
+    <!--    更新书籍-->
+    <delete id="updateBook">
+        update t_book set price = 9.9 where id = #{param1}
+    </delete>
+</mapper>
+```
+
+```java
+//Test_canshu.java
+package com.rao.test;
+
+import com.rao.mapper.BookMapper;
+import com.rao.pojo.Book;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+
+public class Test_cangshu {
+    public static void main(String[] args) throws IOException {
+        //指定核心配置文件的路径
+//        String resource = "org/mybatis/example/mybatis-config.xml";
+        String resource = "mybatis.xml";
+        //获取加载配置文件的输入流
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        //加载配置文件，创建工厂类
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        //通过工厂类获取一个会话
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //使用了动态代理，BookMapper mapper（接口类型） = BookMapper的实现类
+        BookMapper mapper = sqlSession.getMapper(BookMapper.class);
+
+//        多个纯参数
+//        Book book = mapper.selectBookByAuthorandName("史记","无名");
+
+//      一个参数且参数为对象
+//        Book b = new Book();
+//        b.setName("史记");
+//        b.setAuthor("无名");
+//        Book book = mapper.selectBookByAuthorandName2(b);
+
+//        一个参数且参数为对象
+//        Book b2 = new Book();
+//        b2.setAuthor("无名");
+//        Book book = mapper.selectBookByAuthorandName3("史记",b2);
+//
+//        System.out.println(book.getName());
+
+//        插入书籍
+//        Book b3 = new Book(5, "红楼梦", "曹雪芹", 150.3);
+//        int n = mapper.insertBook(b3);
+//        if(n>0){
+//            System.out.println("插入数据成功！n = " + n);
+//        }
+
+//        删除红高粱这本书
+//        int n = mapper.deleteBookByName("红高粱");
+//        if(n>0){
+//            System.out.println("删除数据成功！n = " + n);
+//        }
+
+        //       更新ID= 5 这本书 价格为 9.9
+        int n = mapper.updateBook(5);
+        if(n>0){
+            System.out.println("更新数据成功！n = " + n);
+        }
+
+        //提交事物
+        sqlSession.commit();
+        //关闭资源
+        sqlSession.close();
+    }
+}
+```
+
+### 三、Spring框架
+
+#### Spring引入
+
+对比前面Mybatis，还存在一些问题
+
+1. MyBatis.xml核心配置文件需要创建输入流和工厂类来加载，麻烦
+
+```java
+        //指定核心配置文件的路径
+        String resource = "mybatis.xml";
+        //获取加载配置文件的输入流
+        InputStream inputStream = Resources.getResourceAsStream(resource);
+        //加载配置文件，创建工厂类
+        SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        //通过工厂类获取一个会话
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        //使用了动态代理，BookMapper mapper（接口类型） = BookMapper的实现类
+        BookMapper mapper = sqlSession.getMapper(BookMapper.class);
+```
+
+Spring的优势：方便解耦，简化开发，控制反转
+
+整合各种优秀的框架，例如SSM（Spring、Spring MVC、Mybatis）、不重复造轮子、
+
+需要使用Spring所需的jar包（Maven出现已让jar包管理变得方便）
+
+[Spring官网](spring.io)
+
+![image-20251221192128130](assets/java快速/image-20251221192128130.png)
 
 
 

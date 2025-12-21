@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace取值必须是接口的全限定路径、标签中的id属性值必须和方法名对应-->
+<mapper namespace="com.rao.mapper.BookMapper">
+    <select id="MySelectAllBooks" resultType="Book">
+        select * from t_book
+    </select>
+    <select id="selectBookByAuthorandName" resultType = "Book">
+<!--        下面两种方式等效，arg0,param1  前者从0开始，后者从1开始-->
+<!--        多个纯参数，直接使用argM  或者 paramN-->
+<!--        select * from t_book where name =#{arg0} and author =#{arg1}-->
+        select * from t_book where name =#{param1} and author =#{param2}
+    </select>
+<!--一个参数且参数为对象,直接利用属性名即可-->
+    <select id="selectBookByAuthorandName2" resultType = "Book">
+        select * from t_book where name =#{name} and author =#{author}
+    </select>
+<!--多个参数且参数有对象,非对象类型的参数直接arg/param ,对象类型的参数使用argM.属性名-->
+    <select id="selectBookByAuthorandName3" resultType = "Book">
+        select * from t_book where name =#{param1} and author =#{param2.author}
+    </select>
+
+<!--    增加书籍-->
+    <insert id="insertBook">
+        insert into t_book (id,name,author,price) values (#{id},#{name},#{author},#{price})
+    </insert>
+
+<!--    删除书籍-->
+    <delete id="deleteBookByName">
+        delete from t_book where name = #{param1}
+    </delete>
+
+    <!--    更新书籍-->
+    <delete id="updateBook">
+        update t_book set price = 9.9 where id = #{param1}
+    </delete>
+</mapper>
