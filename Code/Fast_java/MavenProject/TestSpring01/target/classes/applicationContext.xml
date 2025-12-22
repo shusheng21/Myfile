@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+<!--    id:bean的名称   class：类型全限定路径 &ndash;&gt;-->
+    <bean id="b" class="com.rao.pojo.Book">
+<!--        设值注入属性，底层调用类的setId()和setName()方法-->
+
+<!--        <property name="id" value="1"></property>-->
+<!--        <property name="name" value="西游记"></property>-->
+
+<!--        注意name并不是和类的属性名相匹配，而是和setXXX()方法的XXX匹配-->
+<!--        <property name="id1" value="2"></property>-->
+<!--        <property name="name1" value="西游记2"></property>-->
+    </bean>
+
+<!--    再创建一个b2的Book对象-->
+    <bean id="b2" class="com.rao.pojo.Book">
+<!--        使用构造注入属性，底层调用类的构造器-->
+<!--        <constructor-arg name="id" value="3"></constructor-arg>-->
+<!--        <constructor-arg name="name" value="平凡的世界"></constructor-arg>-->
+<!-- 注意name并不是和类的属性名相匹配，而是和构造器中的传入的参数名一致-->
+<!--        <constructor-arg name="id2" value="3"></constructor-arg>-->
+<!--        <constructor-arg name="name2" value="平凡的世界"></constructor-arg>-->
+    </bean>
+    <bean id="boy" class="com.rao.pojo.Boy">
+        <property name="name" value="小刚"></property>
+        <property name="age" value="20"></property>
+    </bean>
+
+    <bean id="girl" class="com.rao.pojo.Girl">
+        <property name="name" value="丽丽"></property>
+        <property name="age" value="18"></property>
+<!--当属性的值是一个类类型，赋值不再使用value，而是用ref,需要引用另一个bean的id(此处为boy)-->
+        <property name="boyfriend" ref="boy"></property>
+    </bean>
+</beans>

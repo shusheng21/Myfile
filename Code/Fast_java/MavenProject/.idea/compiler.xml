@@ -9,6 +9,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="TestSpring01" />
         <module name="MyFirstJarProject" />
         <module name="TestMybatis" />
         <module name="MyBatis_Interface02" />
