@@ -799,7 +799,112 @@ IoC(Inversion of Control)中文名称：控制反转，也被称为DI(dependency
 
 创建对象的权利,或者是控制的位置,由JAVA代码转移到spring容器,由spring的容器控制对象的创建,就是控制反转。
 
-### 三、Web项目
+#### Spring项目-完成IoC/DI代码的实现
+
+项目地址：D:\Myfile\Code\Fast_java\MavenProject\TestSpring01
+
+![image-20251223170851199](assets/java快速/image-20251223170851199.png)
+
+**1.创建项目，添加依赖**
+
+创建普通Maven项目，在项目的pom.xml中添加Spring项目的最基本依赖。
+
+Spring项目想要运行起来必须包含:
+
+- spring-context.jar - 它依赖了下面的四个jar。
+
+- spring-core.jar - 它依赖了spring-jcl.jar
+
+- spring-aop.jar
+
+- spring-expression.jar
+
+- spring-beans.jar
+
+- spring-jcl.jar
+
+  所以在Maven中想要使用Spring框架只需要在项目中导入spring-context就可以了，其他的jar包根据Maven依赖传递性都可以导入进来。
+
+  ```xml
+  <dependencies>
+          <dependency>
+              <groupId>org.springframework</groupId>
+              <artifactId>spring-context</artifactId>
+              <version>5.3.16</version>
+          </dependency>
+      </dependencies>
+  ```
+
+**2.创建一个类** 
+
+**3.创建Spring配置文件**
+
+在src/main/resources下新建applicationContext.xml文件。
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!-- id:bean的名称   class：类型全限定路径 -->
+    <bean id="p" class="com.zss.pojo.Person"></bean>
+</beans>
+```
+
+**4.测试：Test.java**
+
+```java
+// Spring通过加载配置文件，创建Spring容器。
+ApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
+// 从容器中取出叫做p的bean
+Person p2 = (Person)ac.getBean("p");//这种方式需要强转
+```
+
+#### 属性注入
+
+![image-20251223171637732](assets/java快速/image-20251223171637732.png)
+
+在**applicationContext.xml**中实现属性注入
+
+设置属性的值：
+
+方式1：value：简单数据类型（基本数据类型+String）直接设置:
+
+方式2：ref：需要引用另一个bean的id。也就是说这个参数是一个类类型，且这个类的对象也被Spring容器管理。
+
+1. **属性注入 - 设值注入**
+
+```xml
+   <bean id="b" class="com.msb.pojo.Book">
+        <property name="id" value="1"></property>
+        <property name="name" value="项目驱动零起点学Java"></property>
+    </bean>
+```
+
+2. **属性注入 - 构造注入**
+
+```xml
+  <bean id="b" class="com.msb.pojo.Book">
+        <constructor-arg name="id" value="1"></constructor-arg>
+        <constructor-arg name="name" value="项目驱动零起点学Java"></constructor-arg>
+    </bean>
+```
+
+注意：**属性为引用数据类型**的注入方式不同
+
+```xml
+    <bean id="girl" class="com.rao.pojo.Girl">
+        <property name="name" value="丽丽"></property>
+        <property name="age" value="18"></property>
+<!--当属性的值是一个类类型，赋值不再使用value，而是用ref,需要引用另一个bean的id(此处为boy)-->
+        <property name="boyfriend" ref="boy"></property>
+    </bean>
+```
+
+
+
+### 四、Web项目
 
 #### Java项目和web项目的区别
 
@@ -917,6 +1022,8 @@ Web项目——>war项目
 运行点击（5）tomcat7:run 
 
 ![image-20251223165010233](assets/java快速/image-20251223165010233.png)
+
+### 五、Spring MVC
 
 
 
