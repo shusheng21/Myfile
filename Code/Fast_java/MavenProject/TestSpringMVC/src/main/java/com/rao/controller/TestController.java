@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class TestController {
+    //访问路径http://localhost:8887/test1
     @RequestMapping("/test1")
     public String test1(){
         return "index.jsp";

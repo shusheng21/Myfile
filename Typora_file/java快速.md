@@ -1025,11 +1025,107 @@ Web项目——>war项目
 
 ### 五、Spring MVC
 
+项目地址 D:\Myfile\Code\Fast_java\MavenProject\TestSpringMVC
 
+SpringMVC解决了项目**前端和后端的交互**
 
+##### **SpringMVC环境搭建**
 
+1. 创建maven-web项目
+2. 补全目录
+3. 添加依赖
+4. 加入tomcat插件
+5. 创建控制器类，跳转到index.jsp
 
+```java
+@Controller
+public class FirstController {
+    @RequestMapping("/first1")
+    public String test1(){
+        return "/index.jsp"; 
+    }
+}
+```
 
+6. 新建Spring MVC框架配置文件springmvc.xml
+
+```xml
+<!-- 扫描控制器类，千万不要把service等扫描进来，也千万不要在Spring配置文件扫描控制器类所在包 -->
+    <context:component-scan base-package="com.msb.controller"></context:component-scan>
+    <!-- 让Spring MVC的注解生效 ：@RequestMapping-->
+    <mvc:annotation-driven></mvc:annotation-driven>
+```
+
+7. 编写web.xml内容  （可以理解为web项目的启动入口，该文档配置了其他的xml，这样才能识别到其他的xml）
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+  <servlet>
+    <servlet-name>springmvc</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <!-- springmvc.xml 名称自定义，只要和我们创建的配置文件的名称对应就可以了。 -->
+      <param-value>classpath:springmvc.xml</param-value>
+    </init-param>
+    <!-- Tomcat启动立即加载Servlet，而不是等到访问Servlet才去实例化DispatcherServlet -->
+    <!-- 配置上的效果：Tomcat启动立即加载Spring MVC框架的配置文件-->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springmvc</servlet-name>
+    <!-- /表示除了.jsp结尾的uri，其他的uri都会触发DispatcherServlet。此处前往不要写成 /* -->
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+</web-app>
+```
+
+##### SpringMVC接受请求参数
+
+1. **获取普通参数**
+
+获取普通参数，只需要在控制单元中提供与请求参数同名的方法参数即可，Spring MVC会自动进行类型转换。
+
+```java
+    //访问路径http://localhost:8887/test1   这是没有参数的
+    @RequestMapping("/test1")
+    public String test1(){
+        return "index.jsp";
+    }
+```
+
+```java
+//这是带有name和age两个普通参数的    
+//访问路径http://localhost:8887/testspringmvc/testParam?name=marry&age=18     
+    //url中的name和age变量要和方法中的参数名对应
+    @RequestMapping("/testParam")
+    public String testParam(String name,int age){
+        System.out.println(name + "----" + age);
+        return "index.jsp";
+    }
+```
+
+2. **使用类对象作为控制单元参数**
+
+JavaBean：一个包含私有属性，getter/setter方法和无参构造方法的Java类。是不是感觉和实体类特别像。其实写法上和实体类相同。唯一区别是实体类是数据库层面的概念，类型中属性要和数据库字段对应。而JavaBean的属性是灵活的，不是必须和哪里对应的。
+
+JavaBean是一个专业概念，可以简单点理解：使用类对象做为控制单元参数，接收请求参数。如果不是特别较真，狭义上可以认为JavaBean就是项目中的实体类。
+
+在控制单元中放置一个类型对象，对象名称没有要求，只需要保证请求参数名和类的属性名相同就可以了。
+
+```java
+//访问路径http://localhost:8887/testspringmvc/testParam?name=marry&age=18
+    //url中的name和age变量要和Person类中的变量名对应
+    @RequestMapping("/testParam23") //这里面的路径"/testParam23"随便写，不要求和方法名一样
+    public String testParam2(Person p){
+        System.out.println(p.getName() + "----" + p.getAge());
+        return "index.jsp";
+    }
+```
 
 
 
