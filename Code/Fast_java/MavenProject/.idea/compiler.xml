@@ -15,6 +15,7 @@
         <module name="TestSpring01" />
         <module name="TestMybatis" />
         <module name="MyBatis_Interface02" />
+        <module name="TestSpringMVC" />
         <module name="MyFirstJarProject" />
       </profile>
     </annotationProcessing>
