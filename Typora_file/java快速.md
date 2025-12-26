@@ -789,241 +789,39 @@ Spring的优势：方便解耦，简化开发，控制反转
 
 需要使用Spring所需的jar包（Maven出现已让jar包管理变得方便）
 
-[Spring官网](spring.io)
+[Spring官网](https://spring.io)
 
 ![image-20251221192128130](assets/java快速/image-20251221192128130.png)
 
-## **Spring IoC/DI 介绍**
+#### **Spring IoC/DI 介绍**
 
 IoC(Inversion of Control)中文名称：控制反转，也被称为DI(dependency injection )：依赖注入。注意：属于同一件事情的两个名称。
 
 创建对象的权利,或者是控制的位置,由JAVA代码转移到spring容器,由spring的容器控制对象的创建,就是控制反转。
 
-#### Spring项目-完成IoC/DI代码的实现
+IOC/DI原理图
 
-项目地址：D:\Myfile\Code\Fast_java\MavenProject\TestSpring01
+![image-20251222205553509](assets/java快速/image-20251222205553509.png)
 
-![image-20251223170851199](assets/java快速/image-20251223170851199.png)
 
-**1.创建项目，添加依赖**
 
-创建普通Maven项目，在项目的pom.xml中添加Spring项目的最基本依赖。
 
-Spring项目想要运行起来必须包含:
 
-- spring-context.jar - 它依赖了下面的四个jar。
 
-- spring-core.jar - 它依赖了spring-jcl.jar
 
-- spring-aop.jar
 
-- spring-expression.jar
 
-- spring-beans.jar
 
-- spring-jcl.jar
 
-  所以在Maven中想要使用Spring框架只需要在项目中导入spring-context就可以了，其他的jar包根据Maven依赖传递性都可以导入进来。
 
-  ```xml
-  <dependencies>
-          <dependency>
-              <groupId>org.springframework</groupId>
-              <artifactId>spring-context</artifactId>
-              <version>5.3.16</version>
-          </dependency>
-      </dependencies>
-  ```
 
-**2.创建一个类** 
 
-**3.创建Spring配置文件**
 
-在src/main/resources下新建applicationContext.xml文件。
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
-        https://www.springframework.org/schema/beans/spring-beans.xsd">
-    <!-- id:bean的名称   class：类型全限定路径 -->
-    <bean id="p" class="com.zss.pojo.Person"></bean>
-</beans>
-```
 
-**4.测试：Test.java**
 
-```java
-// Spring通过加载配置文件，创建Spring容器。
-ApplicationContext ac = new ClassPathXmlApplicationContext("applicationContext.xml");
-// 从容器中取出叫做p的bean
-Person p2 = (Person)ac.getBean("p");//这种方式需要强转
-```
 
-#### 属性注入
 
-![image-20251223171637732](assets/java快速/image-20251223171637732.png)
-
-在**applicationContext.xml**中实现属性注入
-
-设置属性的值：
-
-方式1：value：简单数据类型（基本数据类型+String）直接设置:
-
-方式2：ref：需要引用另一个bean的id。也就是说这个参数是一个类类型，且这个类的对象也被Spring容器管理。
-
-1. **属性注入 - 设值注入**
-
-```xml
-   <bean id="b" class="com.msb.pojo.Book">
-        <property name="id" value="1"></property>
-        <property name="name" value="项目驱动零起点学Java"></property>
-    </bean>
-```
-
-2. **属性注入 - 构造注入**
-
-```xml
-  <bean id="b" class="com.msb.pojo.Book">
-        <constructor-arg name="id" value="1"></constructor-arg>
-        <constructor-arg name="name" value="项目驱动零起点学Java"></constructor-arg>
-    </bean>
-```
-
-注意：**属性为引用数据类型**的注入方式不同
-
-```xml
-    <bean id="girl" class="com.rao.pojo.Girl">
-        <property name="name" value="丽丽"></property>
-        <property name="age" value="18"></property>
-<!--当属性的值是一个类类型，赋值不再使用value，而是用ref,需要引用另一个bean的id(此处为boy)-->
-        <property name="boyfriend" ref="boy"></property>
-    </bean>
-```
-
-
-
-### 四、Web项目
-
-#### Java项目和web项目的区别
-
-​		Java项目是由main()方法来开始的，直接依赖JVM就能被编译执行。Java项目不需要服务器。
-
-​		Web项目中的Java文件是tomcat服务器来触发的，脱离了web服务器就无法启动。Web项目需要服务器。Web项目部署到服务器上，任何用户都可以通过浏览器来访问。将本地资源共享给外部访问。
-
-#### 使用服务器
-
-Tomcat服务器对Servlet，Jsp，JNDI，JavaMail有很好的的支持，并且这个Web容器是开源免费的。（Apache 开源免费）
-
-#### **通过Maven构建项目**
-
-1.Maven构建项目类型：
-
-Java项目——>jar项目
-
-Web项目——>war项目
-
-2.创建Maven-war项目步骤：
-
-（1）创建Maven项目，添加webapp模板
-
-先勾选create from archetype前面的复选框。
-
-然后选择org.apache.maven.archetypes:maven-archetype-webapp
-
-新建项目的剩余步骤都点击Next按钮即可，和不使用原型时创建Maven项目类似。
-
-![image-20251223092932054](assets/java快速/image-20251223092932054.png)
-
-（2）注意pom.xml中是war项目
-
-```xml
-  <groupId>com.msb</groupId>
-  <artifactId>TestWebProject</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>war</packaging>
-<!--如果是java项目，则为<packaging>jar</packaging>,默认这条语句是省略-->
- <packaging>jar</packaging>
-
-```
-
-
-
-（3）观察目录结构与jar项目不同之处
-
-（4）设置java目录为资源目录
-
-![image-20251223093240108](assets/java快速/image-20251223093240108.png)
-
-（5）添加tomcat（此方法是先下载Tomcat到**本地**计算机，然后在根据后续步骤添加到项目中）
-
-![image-20251223093443988](assets/java快速/image-20251223093443988.png)
-
-![image-20251223093609251](assets/java快速/image-20251223093609251.png)
-
-![image-20251223093727644](assets/java快速/image-20251223093727644.png)
-
-（6）将项目添加到tomcat中
-
-![image-20251223093901407](assets/java快速/image-20251223093901407.png)
-
-将Tomcat和项目做关联
-
-![image-20251223093929654](assets/java快速/image-20251223093929654.png)
-
-（7）运行
-
-点击绿色箭头运行
-
-![image-20251223094123606](assets/java快速/image-20251223094123606.png)
-
-端口号可以自己改
-
-![image-20251223094156326](assets/java快速/image-20251223094156326.png)
-
-#### Tomcat插件
-
-![image-20251223094631010](assets/java快速/image-20251223094631010.png)
-
-在项目的pom.xml中配置Tomcat插件，在<build>中添加Tomcat7插件：（配置之后，本地不用下载Tomcat也可以使用）
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>com.msb</groupId>
-  <artifactId>TestWebProject</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>war</packaging>
-<!--如果是java项目，则为<packaging>jar</packaging>,默认这条语句是省略-->
-  <build>
-    <plugins>
-      <!-- Tomcat插件 -->
-      <plugin>
-        <groupId>org.apache.tomcat.maven</groupId>
-        <artifactId>tomcat7-maven-plugin</artifactId>
-        <version>2.2</version>
-        <configuration>
-          <path>/testwebproject</path><!--指定项目的上下文路径-->
-          <port>8080</port><!-- 端口-->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-</project>
-
-```
-
-运行点击（5）tomcat7:run 
-
-![image-20251223165010233](assets/java快速/image-20251223165010233.png)
-
-### 五、Spring MVC
 
 
 
