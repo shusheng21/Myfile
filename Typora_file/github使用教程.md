@@ -175,7 +175,7 @@ echo "# Mysql_tutorial_backup" >> README.md
 git init
 git add README.md
 git commit -m "first commit"
-git branch -M main
+git branch -M main   
 git remote add origin https://github.com/shusheng21/Mysql_tutorial_backup.git
 git push -u origin main
 ```
@@ -184,11 +184,253 @@ push an existing repository from the command line
 
 ```
 git remote add origin https://github.com/shusheng21/Mysql_tutorial_backup.git
-git branch -M main
+git branch -M main  
 git push -u origin main
 ```
+
+```
+git branch -M main    用于将当前所在的本地分支重命名为 main
+```
+
+
 
 ## = = = = 分割线 = = = =
 
 ---
 
+Git常用撤销操作
+
+![image-20251226220816510](assets/github使用教程/image-20251226220816510.png)
+
+假设在初始状态下这四个区域是保持同步的，只有一个init commit。
+
+对代码文件进行了一些修改，新增内容“做了修改01”。且未进行任何git操作后用git diff
+
+可以看到你的修改后的和**git里面（暂存区）**目前保存的文件有什么不一样
+
+```
+git diff   //查看本地文件和git里面（暂存区）的文件有什么不一样
+```
+
+![image-20251226221649890](assets/github使用教程/image-20251226221649890.png)
+
+![image-20251226222425009](assets/github使用教程/image-20251226222425009.png)
+
+也可以使用git status查看具体是哪个文件被修改了。
+
+注：git status不显示具体哪些内容被修改，只显示哪个文件被修改。而git diff可以显示具体内容的修改
+
+![image-20251226223910265](assets/github使用教程/image-20251226223910265.png)
+
+使用git checkout <文件名> 或者  git restore <文件名>把我们硬盘上对这个文件的修改撤销,恢复这个文件之前的状态
+
+注意：如果在本地修改了文件，**未做任何git操作**和**git add 添加到暂存区**，这两种情况都可以使用git checkout <文件名>  进行恢复，如果文件进行了git commit提交操作，使用该命令无法撤销
+
+```
+git checkout <文件名>  或者  git restore <文件名>    //效果一样
+//在较新版本中推荐使用 git restore
+```
+
+![image-20251227004838491](assets/github使用教程/image-20251227004838491.png)
+
+### 2.撤销git add操作
+
+撤销git add操作，把文件从暂存区中删除，同时保留本地的更改
+
+```
+git reset <changed_file> 
+(  等价于较新版本中的  git restore --staged <changed_file>  )
+//该操作相对安全，只会把文件从暂存区移出，它不会对你硬盘上的源代码本身进行修改
+```
+
+![image-20251227004913931](assets/github使用教程/image-20251227004913931.png)
+
+撤销掉你所有的修改，包括**暂存区和硬盘上**的修改，使用git checkout HEAD <changed_file>
+
+```
+git checkout HEAD <changed_file>
+//HEAD 在git里面表示最近的一次commit
+//注意这个操作会让你丢失硬盘上的修改
+```
+
+![image-20251227004942223](assets/github使用教程/image-20251227004942223.png)
+
+### 3.撤销git commit操作
+
+撤销git commit操作，**把文件从本地的git仓库中删除**，暂存区以及本地磁盘中还存在
+
+```
+git reset --soft HEAD~1
+
+
+//HEAD 在git里面表示最近的一次commit，HEAD~1指向的是当前commit的之前一个提交，同理的HEAD~n指向的是当前commit的之前的n提交
+```
+
+![image-20251226233311923](assets/github使用教程/image-20251226233311923.png)
+
+```
+git reset HEAD~1
+(git reset --mixed HEAD~1)
+//同时撤销你的git commit和git add,把文件从本地git和暂存区都拿掉，只保留硬盘上的修改
+```
+
+![image-20251226233349799](assets/github使用教程/image-20251226233349799.png)
+
+```
+git reset --hard HEAD~1
+//同时撤销你的git commit和git add，以及本地硬盘的修改也撤销。
+//需要小心使用
+```
+
+![image-20251226233701824](assets/github使用教程/image-20251226233701824.png)
+
+```
+git revert HEAD
+//把之前的一个提交拿过来，作为一个新的提交，把当前的提交状态完美保留下来
+```
+
+![image-20251226234241723](assets/github使用教程/image-20251226234241723.png)
+
+reset只能回到之前某一个commit的状态,但是revert可以撤销中间任意一个commit
+
+
+
+这里有问题
+
+![image-20251227001240166](assets/github使用教程/image-20251227001240166.png)
+
+公有分支：不止你一个人在使用的分支，几乎所有项目的主分支都是公有分支
+
+对于公有分支来，只可以往前走，不可以往后退（只能增加，不能减少）
+
+**当修改目标是一个公有分支的时**，只能使用git revert命令，在这个公有分支上新加一个commit
+
+然后从结果上撤销我们之前的修改，修改后以直接使用git push命令
+
+![image-20251227001800691](assets/github使用教程/image-20251227001800691.png)
+
+当修改目标是一个个人分支的时，可以用这个git reset把这个commit直接砍掉，想同步到远端的话
+
+你必须使用git push -f 强制同步
+
+![image-20251227002007687](assets/github使用教程/image-20251227002007687.png)
+
+上述两个操作中会出现合并冲突，需要手动在本地文件解决冲突，然后使用命令 git add <刚才有冲突被解决的文件名>，使用命令 git revert --continue  完成撤销操作。此时会
+
+出现这个界面后，如何操作
+
+![image-20251227002848792](assets/github使用教程/image-20251227002848792.png)
+
+![image-20251227002933594](assets/github使用教程/image-20251227002933594.png)
+
+```
+:q!   //返回到原上一界面，撤销终止
+
+:wq   //接受信息
+```
+
+然后再使用git push 或者 git push -f 即可完成撤销操作
+
+![image-20251227004748526](assets/github使用教程/image-20251227004748526.png)
+
+
+
+1. git中的回退
+
+`Disk`: 本地的修改文件 statuss change XX staged
+
+`stage`: 暂存区 status to be commit
+
+`Local`: 本地的 git 仓库 commit to be push
+
+`Remote`: 远端的存储
+
+![img](assets/github使用教程/236191712db7d479b91b511a0bfa5a853b241bdd.png@682w_!web-note.webp)
+
+
+
+```
+graph TB
+    A[Disk-未变更状态]
+    B[Disk-文件变更但未保存]
+    D[stage-文件变更到缓存区]
+    E[local-保存commit到本地]
+    G[remote-远端仓库]
+
+    A-->|文件修改|B
+    B-->|1. git checkout file|A
+    B-->|2. git add file|D
+    D-->|3. git restore -- staged |B
+    D-->|4. git checkout HEAD|A
+    D-->|5. git commit|E
+    E-->|6. git reset --soft|D
+    E-->|7. git reset --mixed|B
+    E-->|8. git reset --hard|A
+    E-->|9. git revert|E
+    E-->|10. git push|G
+```
+
+1. 撤销`Disk`的修改。（这段测试代码以后都不用了）
+
+```
+git checkout <change file>
+git restore <change file>
+```
+
+1. 将Disk的修改放到缓存区(这个工具类还不错，我需要上传，以后别的代码也用)
+
+```
+git add <change file>
+```
+
+1. 将文件从缓存区移除 (这是我的测试文件，不提交，但是当前开发调试需要)
+
+```
+git restore --staged<change file>
+```
+
+1. 将文件的更改直接删除（这个文件有以后都不用了）
+
+```
+git checkout HEAD <change_file> 丢失硬盘上的修改
+```
+
+1. Locl git reset --soft HEAD1 = git reset --mixed HEAD1 回到上一个提交 保留在暂存区
+2. mixed hard 从disk staging local上都需要找到
+3. 提交缓存数据到本地(写完一个新功能，提交feature1)
+
+```
+git commit -m "feature1 optimse date format."
+```
+
+1. 回退一个commit状态（少加一个文件，commit 信息不对。但是 add 操作大差不差）
+
+```
+git reset --soft HEAD~1
+```
+
+1. 回退一个commit，add也是错的（需要提交20个文件 错加了40个，从重新add ）
+
+```
+git reset --mixed HEAD~1
+```
+
+1. 回退这个commit的提交的文件变动(需求完全推翻，变更不要了，重新开始)
+
+```
+git reset --hard HEAD~1
+```
+
+1. 回退某个commit的提交。（新上线功能依赖数据库没好，先回退。更改以后会合并）
+
+```
+git revert HEAD
+```
+
+1. 把本地的修改push到远端 (我代码好了，推到远端 给leader code review)
+
+```
+HEAD 增加一个commit  是上次使用的commit的反向操作
+```
+
+**tip**：revert 和 reset的差异：1. reset 只能回退上X个提交。而revert 可以回退某个指定的commit 2. reset之后提交信息就没了。revert我这个功能后面还能开回来
