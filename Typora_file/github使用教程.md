@@ -333,104 +333,31 @@ reset只能回到之前某一个commit的状态,但是revert可以撤销中间�
 
 ![image-20251227004748526](assets/github使用教程/image-20251227004748526.png)
 
+### 回退已经提交到远程的某一个文件
 
+**1、查看文件历史，确定目标版本：**
 
-1. git中的回退
+在终端中，进入你的项目目录，使用 `git log`命令查看特定文件的提交历史，找到你希望回退到的那个版本的提交ID（即长长的哈希值，使用前几位即可）。
 
-`Disk`: 本地的修改文件 statuss change XX staged
-
-`stage`: 暂存区 status to be commit
-
-`Local`: 本地的 git 仓库 commit to be push
-
-`Remote`: 远端的存储
-
-![img](assets/github使用教程/236191712db7d479b91b511a0bfa5a853b241bdd.png@682w_!web-note.webp)
-
-
-
-```
-graph TB
-    A[Disk-未变更状态]
-    B[Disk-文件变更但未保存]
-    D[stage-文件变更到缓存区]
-    E[local-保存commit到本地]
-    G[remote-远端仓库]
-
-    A-->|文件修改|B
-    B-->|1. git checkout file|A
-    B-->|2. git add file|D
-    D-->|3. git restore -- staged |B
-    D-->|4. git checkout HEAD|A
-    D-->|5. git commit|E
-    E-->|6. git reset --soft|D
-    E-->|7. git reset --mixed|B
-    E-->|8. git reset --hard|A
-    E-->|9. git revert|E
-    E-->|10. git push|G
+```bash
+git log --oneline -- 你的文件路径/文件名.java
 ```
 
-1. 撤销`Disk`的修改。（这段测试代码以后都不用了）
+**2、执行回退操作**：
 
-```
-git checkout <change file>
-git restore <change file>
-```
+使用 `git checkout`命令，将文件恢复到指定提交时的状态。
 
-1. 将Disk的修改放到缓存区(这个工具类还不错，我需要上传，以后别的代码也用)
-
-```
-git add <change file>
+```bash
+git checkout <目标提交ID> -- 你的文件路径/文件名.java
 ```
 
-1. 将文件从缓存区移除 (这是我的测试文件，不提交，但是当前开发调试需要)
+例如：`git checkout a1b2c3d4 -- src/main/App.java`。
 
-```
-git restore --staged<change file>
-```
+**3、提交并推送更改**：
 
-1. 将文件的更改直接删除（这个文件有以后都不用了）
+此时，该文件在工作区的修改已经被回退。你需要提交这次更改，并推送到远程仓库。
 
+```bash
+git commit -m "revert: 将 App.java 回退到 <提交ID> 的版本"
+git push origin 你的分支名
 ```
-git checkout HEAD <change_file> 丢失硬盘上的修改
-```
-
-1. Locl git reset --soft HEAD1 = git reset --mixed HEAD1 回到上一个提交 保留在暂存区
-2. mixed hard 从disk staging local上都需要找到
-3. 提交缓存数据到本地(写完一个新功能，提交feature1)
-
-```
-git commit -m "feature1 optimse date format."
-```
-
-1. 回退一个commit状态（少加一个文件，commit 信息不对。但是 add 操作大差不差）
-
-```
-git reset --soft HEAD~1
-```
-
-1. 回退一个commit，add也是错的（需要提交20个文件 错加了40个，从重新add ）
-
-```
-git reset --mixed HEAD~1
-```
-
-1. 回退这个commit的提交的文件变动(需求完全推翻，变更不要了，重新开始)
-
-```
-git reset --hard HEAD~1
-```
-
-1. 回退某个commit的提交。（新上线功能依赖数据库没好，先回退。更改以后会合并）
-
-```
-git revert HEAD
-```
-
-1. 把本地的修改push到远端 (我代码好了，推到远端 给leader code review)
-
-```
-HEAD 增加一个commit  是上次使用的commit的反向操作
-```
-
-**tip**：revert 和 reset的差异：1. reset 只能回退上X个提交。而revert 可以回退某个指定的commit 2. reset之后提交信息就没了。revert我这个功能后面还能开回来
